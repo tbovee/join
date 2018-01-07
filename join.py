@@ -32,20 +32,46 @@ parameters =
 -kr keyright
 -dl delimleft
 -dr delimright
--n  colnames
+-cn  colnames
 
 '''
 
+# Command line arguments
 
+# Global names
 kleft = 0
 kright = 0
-
-
- 
 
 # Import modules
 import sys
 # import pandas as pd
+
+def getargs():
+	n = len(sys.argv)-1
+	for i in range(0,n):
+		if sys.argv[i] = '-tl':
+			tableleft = sys.argv[i+1]
+		elif sys.argv[i] = '-tr':
+			tableright = sys.argv[i+1]
+		elif sys.argv[i] = '-kl':
+			keyleft = sys.argv[i+1]
+		elif sys.argv[i] = '-kr':
+			keyright = sys.argv[i+1]
+		elif sys.argv[i] = '-dl':
+			delimleft = sys.argv[i+1]
+		elif sys.argv[i] = '-dr':
+			delimright = sys.argv[i+1]
+		elif sys.argv[i] = '-cn':
+			cn = sys.argv[i+1]
+			if cn = 1:
+				colnames = True
+			else
+				colnames = False
+# END getargs			
+		
+	
+
+# End args
 
 def importfile(table,delim,key,k) :
   F = open (table, 'r')
@@ -59,7 +85,6 @@ def importfile(table,delim,key,k) :
   		first = 1
   		# Test lioness
   	print curr
-  	print "Key " 
   		# End Test
 # End importfile
 
