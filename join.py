@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 # A learning project to learn python, just for me.
+# Version 20180107.1355
 '''
 Program join imports two files 
 	in the csv format (no quotes around strings) 
@@ -10,35 +11,25 @@ and then selects each matching record from file "Fright'.
 It will combine all of the fields in Fleft with all of the fields, excepting the key field,
 from Fright.
 
-Needed vVariables
+Invoke:
 
-tableleft string
-tableright string
-keyleft integer
-keyright integer
-delimleft integer
-delimright integer
-colnames boolean
-kleft integer
-kright integer
-
-
-Commandline 
-join [parameters]
-parameters =
--tl tableleft
--tr tableright
--kl keyleft
--kr keyright
--dl delimleft
--dr delimright
--cn  colnames
+join.py -type -value [type value ...]
 
 '''
+
+# QUESTION TO RESEARCH: I need an array of arrays for each table to most efficiently compare them.
+# How do I do that?
 
 # Command line arguments
 
 # Global names
+fileleft = ""
+fileright = ""
+keyleft = 0
+keyright = 0
+delimleft = ","
+delimright = ","
+colnames = False
 kleft = 0
 kright = 0
 
@@ -46,35 +37,31 @@ kright = 0
 import sys
 # import pandas as pd
 
-def getargs():
-	n = len(sys.argv)-1
-	for i in range(0,n):
-		if sys.argv[i] = '-tl':
-			tableleft = sys.argv[i+1]
-		elif sys.argv[i] = '-tr':
-			tableright = sys.argv[i+1]
-		elif sys.argv[i] = '-kl':
-			keyleft = sys.argv[i+1]
-		elif sys.argv[i] = '-kr':
-			keyright = sys.argv[i+1]
-		elif sys.argv[i] = '-dl':
-			delimleft = sys.argv[i+1]
-		elif sys.argv[i] = '-dr':
-			delimright = sys.argv[i+1]
-		elif sys.argv[i] = '-cn':
-			cn = sys.argv[i+1]
-			if cn = 1:
-				colnames = True
-			else
-				colnames = False
-# END getargs			
-		
-	
 
-# End args
+n = len(sys.argv)-1
+for i in range(0,n):
+	if sys.argv[i] == '-tl':
+		fileleft = sys.argv[i+1]
+	elif sys.argv[i] == '-tr':
+		fileright = sys.argv[i+1]
+	elif sys.argv[i] == '-kl':
+		keyleft = sys.argv[i+1]
+	elif sys.argv[i] == '-kr':
+		keyright = sys.argv[i+1]
+	elif sys.argv[i] == '-dl':
+		delimleft = sys.argv[i+1]
+	elif sys.argv[i] == '-dr':
+		delimright = sys.argv[i+1]
+	elif sys.argv[i] == '-cn':
+		cn = sys.argv[i+1]
+		if cn == 1:
+			colnames = True
+		else:
+			colnames = False
 
-def importfile(table,delim,key,k) :
-  F = open (table, 'r')
+
+def importfile(filename,delim,key,k) :
+  F = open (filename, 'r')
   first = 0
   for line in F :
 	  	# Split into fields
@@ -84,24 +71,30 @@ def importfile(table,delim,key,k) :
   		k = len(curr)
   		first = 1
   		# Test lioness
+  	# Add curr to 
   	print curr
   		# End Test
 # End importfile
 
 
+
+
 def main() :
 
 	  # Test run
-	tableleft = "./tl.csv"
-	tableright = "./tr.csv"
-	keyleft = 1
-	keyright = 3
-	delimleft = ","
-	delimright = ","
-	colnames = False
 
-	importfile(tableleft,",",1,kleft)
-	importfile(tableright,",",3,kright)
+	print "Print args"
+	print fileleft
+	print tableright
+	print keyleft
+	print keyright
+	print delimleft
+ 	print delimright
+ 	print colnames
+
+
+	importfile(fileleft,",",1,kleft)
+	importfile(fileright,",",3,kright)
 	
 	return
 		# End Test  
