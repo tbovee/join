@@ -37,6 +37,10 @@ parameters =
 '''
 
 
+kleft = 0
+kright = 0
+
+
  
 
 # Import modules
@@ -44,32 +48,36 @@ import sys
 # import pandas as pd
 
 def importfile(table,delim,key,k) :
-  Fleft = open (table', 'rU')
+  F = open (table, 'r')
   first = 0
   for line in F :
 	  	# Split into fields
   	curr = line.split(delim)
 	  	# Save the number of fields
-  	if first = 0:
+  	if first == 0:
   		k = len(curr)
   		first = 1
   		# Test lioness
   	print curr
+  	print "Key " 
   		# End Test
 # End importfile
 
 
-def main() : 
+def main() :
+
 	  # Test run
-	tableleft = "tl.csv"
-	tableright = "tr.csv"
+	tableleft = "./tl.csv"
+	tableright = "./tr.csv"
 	keyleft = 1
 	keyright = 3
 	delimleft = ","
 	delimright = ","
 	colnames = False
 
-	importfile()
+	importfile(tableleft,",",1,kleft)
+	importfile(tableright,",",3,kright)
+	
 	return
 		# End Test  
 #End main
