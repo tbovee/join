@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
-# A learning project to learn python, just for me.
+# project as part of my learning python, restricted to the built-ins
 # Version 20180107.1355
+
 '''
 Program join imports two files 
 	in the csv format (no quotes around strings) 
@@ -17,8 +18,35 @@ join.py -type -value [type value ...]
 
 '''
 
-# QUESTION TO RESEARCH: I need an array of arrays for each table to most efficiently compare them.
-# How do I do that?
+'''
+QUESTION TO RESEARCH: I need an array of arrays for each table to most efficiently compare them.
+
+And it appears not to be possible
+
+SOLUTION: 
+
+Create symlists symleft, symright, ptrleft, ptrright
+Within def importfile save the field containing the stock symbol in symleft or symright, 
+depending upon the table, and the line number (count withi the file excluding the
+colnames) to ptrleft and ptrright, respectively.
+
+In doing the join, 
+	For reach item in one symlist , check the other symist for a matching symbol, 
+	and get the line number from the target ptrlist. Reach the target file until
+	the line number in ptrllist is reached, then capture the data from both files.
+	
+	Intuitively, I think it makes most since to the longest table to be the source
+	file and the shortest the target, since the target must be read multiple times.
+	
+	Is a ptrlist needed for the source table? Probably not,
+	
+	The sourcetable should be designatable in the command line.
+	
+
+'''
+
+
+
 
 # Command line arguments
 
