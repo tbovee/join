@@ -25,6 +25,29 @@ And it appears not to be possible
 
 SOLUTION: 
 
+--Frame the sides of the join as follows:
+	Job: 
+		Load the target file into a list
+			While loading extact the key field data and the line number into a ptr list
+		Read the Source file
+			Split each line
+			Compare the key field with the Target key list (reading the list until
+				there's match or the end is reached).
+			If there's a match, then 
+				Locate the Target data in the Target list using the ptr list
+				Combine the Target data with the source data
+				
+	The Source is the file that has the data to be read
+	The Target is the file to which the Source symbols are to be compared
+	The Out is the file to which the combination of the Source and Target data is written
+	
+--In arguments, rather than -tl, -tr, makes it -t for target and -s for source
+	and add -o for output file
+--In variables replace "...left", "...right" with "...tgt", "...src"
+
+
+Read the Target file
+	
 Create symlists symleft, symright, ptrleft, ptrright
 Within def importfile save the field containing the stock symbol in symleft or symright, 
 depending upon the table, and the line number (count withi the file excluding the
