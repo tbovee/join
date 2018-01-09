@@ -1,114 +1,117 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180107.1355
+# Version 20180109.1140P
 
 '''
-Program join imports two files 
-	in the csv format (no quotes around strings) 
-	with a single key column
-It reads file "Fleft", which will typically be the smallest table,
-and then selects each matching record from file "Fright'.
-It will combine all of the fields in Fleft with all of the fields, excepting the key field,
-from Fright.
+Program joins two records from files together, each having a common key.
 
 Invoke:
 
-join.py -type -value [type value ...]
+join.py input-filename1 input-filename2 -output-filename [-type] [value] ...
+
+The names of the files containing the records to be joined require no -type and must be
+in the first three positions of the commandline parameters.
+The first filename entered is input for table1 in the code, 
+and the second entered is input for table2. The third entered is the output file.
+
+Other parameters take a -type (such as -sep to specify the character that
+separates fields in a record), and then in the next positon, that parameter for the
+specified -type.
+
+The types, meanings and defaults are:
+
+-k1, -k2 points to the column containing the key field, where zero is
+	the leftmost column. Default: 0
+-s1, -s2 points to the character used to separat fields. The character
+	must be surrounded by quote marks on the commandline. Default: ","
+-n1, -n2 informs that the first column of the file contains the names
+	of the fields and sets a flag in code to TRUE. 
+	It requires no value. Default (i.e., the -n1 or -n2 flag is absent
+	from the commandline): FALSE
 
 '''
 
 '''
-QUESTION TO RESEARCH: I need an array of arrays for each table to most efficiently compare them.
+OVERVIEW:
 
-And it appears not to be possible
+Read the command line arguments.
 
-SOLUTION: 
+Load file1 and file 2 into separate lists.
+	For each file,
+	split each line and extract the key data; increment the tablecount to create the
+	ptr data; add each their ptr lists.
+	While loading extact the key field data and the line number into a ptr list
+	Ptr list structure: keydata, pointer, keydata, pointer...
+		where the pointer is associated with the preceding keydata.
 
---Frame the sides of the join as follows:
-	Job: 
-		Load the target file into a list
-			While loading extact the key field data and the line number into a ptr list
-		Read the Source file
-			Split each line
-			Compare the key field with the Target key list (reading the list until
-				there's match or the end is reached).
-			If there's a match, then 
-				Locate the Target data in the Target list using the ptr list
-				Combine the Target data with the source data
-				
-	The Source is the file that has the data to be read
-	The Target is the file to which the Source symbols are to be compared
-	The Out is the file to which the combination of the Source and Target data is written
-	
---In arguments, rather than -tl, -tr, makes it -t for target and -s for source
-	and add -o for output file
---In variables replace "...left", "...right" with "...tgt", "...src"
+Joining the files
 
+After the table lists are loaded, compare tablecount1 and tablecount2. 
+If tablecount1 is larger than tablecount2, then assign 
+tablecount1 to smalltable; otherwise, assign it to bigtable. Assign
+the unassigned numbered table to the yet unassigned bigtable or smalltable.
 
-Read the Target file
-	
-Create symlists symleft, symright, ptrleft, ptrright
-Within def importfile save the field containing the stock symbol in symleft or symright, 
-depending upon the table, and the line number (count withi the file excluding the
-colnames) to ptrleft and ptrright, respectively.
+Assign the associated pointer lists in the same way, ptr1 and ptr2 to bigptr and 
+smallptr.
 
-In doing the join, 
-	For reach item in one symlist , check the other symist for a matching symbol, 
-	and get the line number from the target ptrlist. Reach the target file until
-	the line number in ptrllist is reached, then capture the data from both files.
-	
-	Intuitively, I think it makes most since to the longest table to be the source
-	file and the shortest the target, since the target must be read multiple times.
-	
-	Is a ptrlist needed for the source table? Probably not,
-	
-	The sourcetable should be designatable in the command line.
-	
+Each table has a separate function.
+
+The ptr list for the largest, bigtable, is read one line at a time. 
+For each key it contains, it loops through the pointers of the 
+other table, smalltable, until it finds a matching key.
+When a matching key is found, the two lines are combined and written to
+the output file, outfile.
+
+#END 
 
 '''
-
-
-
 
 # Command line arguments
 
 # Global names
-fileleft = ""
-fileright = ""
-keyleft = 0
-keyright = 0
-delimleft = ","
-delimright = ","
-colnames = False
-kleft = 0
-kright = 0
+file1 = ""
+file2 = ""
+outfile = ""
+key1 = 0
+key2 = 0
+sep1 = ","
+sep2 = ","
+names1 = False
+names2 = False
+
+tablecount1 = 0
+tablecount2 = 0
+
+bigtable = ""
+smalltable = ""
+bigptr = ""
+smallptr = ""
 
 # Import modules
 import sys
-# import pandas as pd
-
+# import pandas as pd # For revision after completion, maybe
 
 n = len(sys.argv)-1
-for i in range(0,n):
-	if sys.argv[i] == '-tl':
-		fileleft = sys.argv[i+1]
-	elif sys.argv[i] == '-tr':
-		fileright = sys.argv[i+1]
+# Error checking here if n < 2
+file1 = sys.argv[0]
+file2 = sys.argv[1]
+outfile = sys.argv[2]
+for i in range(2,n):
 	elif sys.argv[i] == '-kl':
-		keyleft = sys.argv[i+1]
-	elif sys.argv[i] == '-kr':
-		keyright = sys.argv[i+1]
-	elif sys.argv[i] == '-dl':
-		delimleft = sys.argv[i+1]
-	elif sys.argv[i] == '-dr':
-		delimright = sys.argv[i+1]
-	elif sys.argv[i] == '-cn':
-		cn = sys.argv[i+1]
-		if cn == 1:
-			colnames = True
-		else:
-			colnames = False
+		key1 = sys.argv[i+1]
+	elif sys.argv[i] == '-k2':
+		key2 = sys.argv[i+1]
+	elif sys.argv[i] == '-s1':
+		sep1 = sys.argv[i+1]
+	elif sys.argv[i] == '-s2':
+		sep2 = sys.argv[i+1]
+	elif sys.argv[i] == '-n1':
+		names1 = TRUE
+	elif sys.argv[i] == '-n2':
+		names2 = TRUE
+	else
+		help()
 
 
 def importfile(filename,delim,key,k) :
