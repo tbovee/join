@@ -1,12 +1,15 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180109.1140P
-
+# Version 20180109.1545P
+# STATUS: Syntax error issues
 '''
+PURPOSE
+:
 Program joins two records from files together, each having a common key.
+END PURPOSE
 
-Invoke:
+INVOKE:
 
 join.py input-filename1 input-filename2 -output-filename [-type] [value] ...
 
@@ -29,15 +32,13 @@ The types, meanings and defaults are:
 	of the fields and sets a flag in code to TRUE. 
 	It requires no value. Default (i.e., the -n1 or -n2 flag is absent
 	from the commandline): FALSE
+END INVOKE
 
-'''
-
-'''
 OVERVIEW:
 
 Read the command line arguments.
 
-Load file1 and file 2 into separate lists.
+Load file1 and file2 into separate lists.
 	For each file,
 	split each line and extract the key data; increment the tablecount to create the
 	ptr data; add each their ptr lists.
@@ -63,42 +64,60 @@ other table, smalltable, until it finds a matching key.
 When a matching key is found, the two lines are combined and written to
 the output file, outfile.
 
-#END 
+Important naming conventions:
+Disk names are called ...file...
+The field number holding the keys is called ...key...
+The character delimiting fields in a CSV file is called ...sep...
+The presence or absense of fieldnames in the first line is denoted by ...names...
+A list containing data is called ...table...
+A list containing pointers to the data is called ...ptrs...
+A number pointing to a single record in a table is a a ...ptr...
+The total number of records in a table is called ...count...
+
+
+END OVERVIEW
 
 '''
 
 # Command line arguments
 
 # Global names
-file1 = ""
-file2 = ""
-outfile = ""
-key1 = 0
-key2 = 0
-sep1 = ","
-sep2 = ","
-names1 = False
-names2 = False
+file1 = ""  	# str points to the first input file
+file2 = ""  	# str points to the second input file
+outfile = "" 	# str points to the output product
+key1 = 0 		# int points to the field containing the first key: default first field
+key2 = 0		# int points to the field containing the second key: default first field
+sep1 = ","		# char sets the field seprator character in file1 to default comma
+sep2 = ","		# char sets the field seprator character in file2 to default comma
+names1 = False	# bool if true, designates the first line of file1 to be fieldnames
+names2 = False	# bool if true, designates the first line of file2 to be fieldnames
 
-tablecount1 = 0
-tablecount2 = 0
+tablecount1 = 0	# int holds total number of non-fieldname lines in file1
+tablecount2 = 0 # int holds total number of non-fieldname lines in file2
 
-bigtable = ""
-smalltable = ""
-bigptr = ""
-smallptr = ""
+bigtable = ""	# list holds the data with the greater number of records
+smalltable = ""	# list holds the data with the smaller number of records
+bigptrs = ""	# list holds the key data and ptr for each line in bigtable
+smallptrs = ""	# list holds the key data and ptr for each line in smalltable.
+bigptr = ""		# int points to current record in bigable
+smallptr = ""	# int points to current record in smalltable
+
+# END Global names
 
 # Import modules
 import sys
 # import pandas as pd # For revision after completion, maybe
+# END Import modules
 
+
+# Get arguments
 n = len(sys.argv)-1
 # Error checking here if n < 2
 file1 = sys.argv[0]
 file2 = sys.argv[1]
 outfile = sys.argv[2]
 for i in range(2,n):
-	elif sys.argv[i] == '-kl':
+	if sys.argv[i] == '-kl':
 		key1 = sys.argv[i+1]
 	elif sys.argv[i] == '-k2':
 		key2 = sys.argv[i+1]
@@ -110,46 +129,83 @@ for i in range(2,n):
 		names1 = TRUE
 	elif sys.argv[i] == '-n2':
 		names2 = TRUE
+	else:
+		print "Usage: join.py input-filename1 input-filename2 -output-filename [-type] [value] ..."
+#END Get arguments()
+
+def procline(s,sep,key,table,ptrs,ptr)
+# Splits s into fields and inserts into appropriate lists
+'''
+Is the var tablecount needed here?
+'''
+  	curr = s.split(sep)
+  	k = len(curr)
+	if key < k:
+		table.append(curr)
+		ptrs.append(curr[key])
+		ptrs.append(ptr)
+# END procline
+
+
+def importfile(sep,key,table,ptrs,ptr,file,names,tablecount)
+# Reads file from disk and passes each line to procfile()
+'''
+Q: Would it be more efficient to read the entire file into a list and then get the size
+from the list rather than doing a count? Probably yes.
+'''
+	ptr = 0
+	F = open(file, 'r')
+	for line in F :
+		ptr = ptr + 1
+		if ptr == 1
+			if names == FALSE
+				procline(line,sep,key,table,ptrs)  
+			else
+				procline(line,sep,key,table,ptrs)  
+	tablecount = ptr
+# END importfile
+
+def importfiles() :
+# Imports the input files in turn, assesses the size of each, and assigns
+# the larger to the big... series of lists and the smaller to the small...
+# series of lists
+	count1 = importfile(sep1,key1,table1,ptrs1,ptr1,file1,names1,tablecount1)
+	count2 = importfile(sep2,key2,table2,ptrs2,ptr2,file2,names2,tablecount2)
+	if count1 > count2:
+		bigfile = file1
+		bigkey = key1
+		smallfile = file2
+		smallkey = key2
 	else
-		help()
-
-
-def importfile(filename,delim,key,k) :
-  F = open (filename, 'r')
-  first = 0
-  for line in F :
-	  	# Split into fields
-  	curr = line.split(delim)
-	  	# Save the number of fields
-  	if first == 0:
-  		k = len(curr)
-  		first = 1
-  		# Test lioness
-  	# Add curr to 
-  	print curr
-  		# End Test
-# End importfile
-
-
-
+		bigfile = file2
+		bigkey = key2
+		smallfile = file1
+		smallkey = key1
+			'''
+			Q: Does the following zeroing out save memory?
+			In making the assignments above, do the assigned files take on a separate existence
+			from their destination variables?
+			'''
+	file1 = ""
+	key1 = ""
+	file2 = ""
+	key2 = ""
+# END importfiles
 
 def main() :
+	arguments()
+	importfiles()
+	# Test output
+	print "Bigkey"
+	print bigkey
+	print "Smallkey"
+	print smallkey
+	print "Bigtable"
+	print bigtable
+	print "Smalltable"
+	print smalltable
+	# END Test output
 
-	  # Test run
-
-	print "Print args"
-	print fileleft
-	print tableright
-	print keyleft
-	print keyright
-	print delimleft
- 	print delimright
- 	print colnames
-
-
-	importfile(fileleft,",",1,kleft)
-	importfile(fileright,",",3,kright)
-	
 	return
 		# End Test  
 #End main
