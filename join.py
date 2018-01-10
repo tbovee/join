@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180110.1040A
-# STATUS: Problems with local variables used as arguments in def calls
+# Version 20180110.1311A
+# STATUS: var table is local and global
 
 '''
 PURPOSE
@@ -36,7 +36,7 @@ The types, meanings and defaults are:
 END INVOKE
 
 OVERVIEW:
-
+(Outdated)
 Read the command line arguments.
 
 Load file1 and file2 into separate lists.
@@ -97,9 +97,6 @@ pointers2 = ""
 pointer1 = 0
 pointer2 = 0
 
-tablecount1 = 0		# int holds total number of non-fieldname lines in file1
-tablecount2 = 0 	# int holds total number of non-fieldname lines in file2
-
 bigtable = ""		# list holds the data with the greater number of records
 smalltable = ""		# list holds the data with the smaller number of records
 bigpointers = ""	# list holds the key data and pointer for each line in bigtable
@@ -154,8 +151,10 @@ def procline(s,sep,key,table,pointers,pointer):
 # END procline
 
 
-def importfile(sep,key,table,pointers,pointer,file,names,tablecount):
+def importfile(sep,key,table,pointers,pointer,file,names):
 # Reads file from disk and passes each line to procfile()
+	global table
+
 	'''
 	Q: Would it be more efficient to read the entire file into a list and then get the size
 	from the list rather than doing a count? Probably yes.
@@ -163,21 +162,28 @@ def importfile(sep,key,table,pointers,pointer,file,names,tablecount):
 	pointer = 0
 	F = open(file, 'r')
 	for line in F :
-		pointer = pointer + 1
 		if pointer == 1:
 			if names == FALSE:
 				procline(line,sep,key,table,pointers)  
 			else:
 				procline(line,sep,key,table,pointers)  
-	tablecount = pointer
+	return len(table)
 # END importfile
 
 def importfiles():
 # Imports the input files in turn, assesses the size of each, and assigns
 # the larger to the big... series of lists and the smaller to the small...
 # series of lists
-	count1 = importfile(sep1,key1,pointers1,pointer1,file1,names1,tablecount1)
-	count2 = importfile(sep2,key2,pointers2,pointer2,file2,names2,tablecount2)
+	global bigfile
+	global bigkey
+	global smallfile
+	global smallkey
+	global pointers1
+	global pointers2
+	global pointer1
+	global pointer2
+	count1 = importfile(sep1,key1,pointers1,pointer1,file1,names1)
+	count2 = importfile(sep2,key2,pointers2,pointer2,file2,names2)
 	if count1 > count2:
 		bigfile = file1
 		bigkey = key1
@@ -188,11 +194,13 @@ def importfiles():
 		bigkey = key2
 		smallfile = file1
 		smallkey = key1
-		'''
-		Q: Should key1, key2, table1, table2 be zeroed out to save memory?
-		In making the assignments above, do the assigned files take on a separate existence
-		from their destination variables?
-		'''
+	'''
+	Truncating import files to reclaim memory	
+	'''
+	file1 = ""
+	file2 = ""
+	pointers1 = ""
+	pointers2 = ""
 # END importfiles
 
 def main() :
