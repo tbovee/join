@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180110.xxxxA
-# STATUS: 
+# Version 20180110.1040A
+# STATUS: Problems with local variables used as arguments in def calls
+
 '''
 PURPOSE
 :
@@ -91,6 +92,10 @@ sep1 = ","		# char sets the field seprator character in file1 to default comma
 sep2 = ","		# char sets the field seprator character in file2 to default comma
 names1 = False	# bool if true, designates the first line of file1 to be fieldnames
 names2 = False	# bool if true, designates the first line of file2 to be fieldnames
+pointers1 = ""
+pointers2 = ""
+pointer1 = 0
+pointer2 = 0
 
 tablecount1 = 0		# int holds total number of non-fieldname lines in file1
 tablecount2 = 0 	# int holds total number of non-fieldname lines in file2
@@ -113,23 +118,26 @@ import sys
 def arguments():
 # Get arguments
 	n = len(sys.argv)-1
-	# Error checking here if n < 2
-	file1 = sys.argv[0]
-	file2 = sys.argv[1]
-	outfile = sys.argv[2]
-	for i in range(2,n):
-		if sys.argv[i] == '-kl':
-			key1 = sys.argv[i+1]
-		elif sys.argv[i] == '-k2':
-			key2 = sys.argv[i+1]
-		elif sys.argv[i] == '-s1':
-			sep1 = sys.argv[i+1]
-		elif sys.argv[i] == '-s2':
-			sep2 = sys.argv[i+1]
-		elif sys.argv[i] == '-n1':
-			names1 = TRUE
-		elif sys.argv[i] == '-n2':
-			names2 = TRUE
+	if n < 2:
+		print "Usage: join.py input-filename1 input-filename2 -output-filename [-type] [value] ..."
+		return -1
+	else:	
+		file1 = sys.argv[0]
+		file2 = sys.argv[1]
+		outfile = sys.argv[2]
+		for i in range(2,n):
+			if sys.argv[i] == '-kl':
+				key1 = sys.argv[i+1]
+			elif sys.argv[i] == '-k2':
+				key2 = sys.argv[i+1]
+			elif sys.argv[i] == '-s1':
+				sep1 = sys.argv[i+1]
+			elif sys.argv[i] == '-s2':
+				sep2 = sys.argv[i+1]
+			elif sys.argv[i] == '-n1':
+				names1 = TRUE
+			elif sys.argv[i] == '-n2':
+				names2 = TRUE
 #END Get arguments()
 
 def procline(s,sep,key,table,pointers,pointer):
@@ -168,8 +176,8 @@ def importfiles():
 # Imports the input files in turn, assesses the size of each, and assigns
 # the larger to the big... series of lists and the smaller to the small...
 # series of lists
-	count1 = importfile(sep1,key1,table1,pointers1,pointer1,file1,names1,tablecount1)
-	count2 = importfile(sep2,key2,table2,pointers2,pointer2,file2,names2,tablecount2)
+	count1 = importfile(sep1,key1,pointers1,pointer1,file1,names1,tablecount1)
+	count2 = importfile(sep2,key2,pointers2,pointer2,file2,names2,tablecount2)
 	if count1 > count2:
 		bigfile = file1
 		bigkey = key1
@@ -181,32 +189,28 @@ def importfiles():
 		smallfile = file1
 		smallkey = key1
 		'''
-		Q: Does the following zeroing out save memory?
+		Q: Should key1, key2, table1, table2 be zeroed out to save memory?
 		In making the assignments above, do the assigned files take on a separate existence
 		from their destination variables?
 		'''
-	file1 = ""
-	key1 = ""
-	file2 = ""
-	key2 = ""
 # END importfiles
 
 def main() :
-	arguments()
-	importfiles()
-	# Test output
-	print "Bigkey"
-	print bigkey
-	print "Smallkey"
-	print smallkey
-	print "Bigtable"
-	print bigtable
-	print "Smalltable"
-	print smalltable
+	if arguments() == -1:
+		return
+	else:
+		importfiles()
+		# Test output
+		print "Bigkey"
+		print bigkey
+		print "Smallkey"
+		print smallkey
+		print "Bigtable"
+		print bigtable
+		print "Smalltable"
+		print smalltable
 	# END Test output
-
 	return
-		# End Test  
 #End main
 
 # CALL MAIN
