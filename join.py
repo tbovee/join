@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180113.1108A
-# ERR STATUS: filename param unpassed to importfile()
+# Version 20180113.1302P
+# ERR STATUS: file2 not being processed downstream
 
 '''
 PURPOSE
@@ -37,6 +37,7 @@ END INVOKE
 
 '''
 
+DEBUG = True
 # Command line arguments
 
 # Global names
@@ -62,29 +63,27 @@ import sys
 # END Import modules
 
 
-def arguments():
-# Get arguments
-	n = len(sys.argv)-1
-	if n < 3:
-		print "Usage: join.py input-filename1 input-filename2 -output-filename [-type] [value] ..."
-		return -1
-	else:	
-		file1 = sys.argv[1]
-		file2 = sys.argv[2]
-		outfile = sys.argv[3]
-		for i in range(4,n):
-			if sys.argv[i] == '-kl':
-				key1 = sys.argv[i+1]
-			elif sys.argv[i] == '-k2':
-				key2 = sys.argv[i+1]
-			elif sys.argv[i] == '-s1':
-				sep1 = sys.argv[i+1]
-			elif sys.argv[i] == '-s2':
-				sep2 = sys.argv[i+1]
-			elif sys.argv[i] == '-n1':
-				names1 = TRUE
-			elif sys.argv[i] == '-n2':
-				names2 = TRUE
+n = len(sys.argv)-1
+if n < 3:
+	print "Usage: join.py input-filename1 input-filename2 -output-filename [-type] [value] ..."
+	sys.exit()
+else:	
+	file1 = sys.argv[1]
+	file2 = sys.argv[2]
+	outfile = sys.argv[3]
+	for i in range(4,n):
+		if sys.argv[i] == '-kl':
+			key1 = sys.argv[i+1]
+		elif sys.argv[i] == '-k2':
+			key2 = sys.argv[i+1]
+		elif sys.argv[i] == '-s1':
+			sep1 = sys.argv[i+1]
+		elif sys.argv[i] == '-s2':
+			sep2 = sys.argv[i+1]
+		elif sys.argv[i] == '-n1':
+			names1 = TRUE
+		elif sys.argv[i] == '-n2':
+			names2 = TRUE
 #END Get arguments()
 
 def procline(s,table,key,sep):
@@ -93,23 +92,27 @@ def procline(s,table,key,sep):
   	k = len(curr)
 	if key < k:
 		table.append(curr)
+		if DEBUG == True:
+			print "Raw line: "
+			print s
+			print "Processed rec: "
+			print table
+			print "-----------------"
 # END procline
 
 
-def importfile(filename,table,key,sep,names):
+def importfile(fileobj, filename,table,key,sep,names):xx
 # Reads file from disk and passes each line to procfile()
 	pointer = 0
-	print "Filename:"
-	print filename
-	sys.exit()
-	F = open(filename, 'r')
-	for line in F :
+	for line in fileobj :
 		if pointer == 1:
-			if names == FALSE:
+			if names == False:
 				procline(line,table,key,sep)
 		else:
 			procline(line,table,key,sep)
+		pointer = pointer + 1
 	return len(table)
+
 # END importfile
 
 def importfiles():
@@ -124,8 +127,15 @@ def importfiles():
 	global smallkey
 	global table1
 	global table2
-	count1 = importfile(file1,table1,key1,sep1,names1)
-	count2 = importfile(file2,table2,key2,sep2,names2)
+	F1 = open(file1, 'r')
+	count1 = importfile(F1,file1,table1,key1,sep1,names1)
+	F1.close()
+	F2 = open(file2, 'r')	
+	count2 = importfile(F2,file2,table2,key2,sep2,names2)
+	F2.close()
+	if DEBUG == True:
+		print "importfiles:"
+		print "Count file1=",str(count1)," file2=",str(count2)
 	if count1 > count2:
 		bigtable = table1
 		bigkey = key1
@@ -137,19 +147,15 @@ def importfiles():
 		smalltable = table1
 		smallkey = key1
 	'''
-	Truncating import files and tables to reclaim memory	
+	Truncating import tables to reclaim memory	
 	'''
-	file1 = ""
-	file2 = ""
 	table1 = []
 	table2 = []
 # END importfiles
 
 def main() :
-	if arguments() == -1:
-		return
-	else:
-		importfiles()
+	importfiles()
+	if DEBUG == False:
 		# Test output
 		print "Bigkey"
 		print bigkey
@@ -159,7 +165,7 @@ def main() :
 		print bigtable
 		print "Smalltable"
 		print smalltable
-	# END Test output
+		# END Test output
 	return
 #End main
 
