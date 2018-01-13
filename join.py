@@ -1,9 +1,8 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180113.1020A
-# ERR STATUS: var table is local and global in import routines
-# TODO: Drop the pointers, use multidimensional lists
+# Version 20180113.1108A
+# ERR STATUS: filename param unpassed to importfile()
 
 '''
 PURPOSE
@@ -36,8 +35,6 @@ The types, meanings and defaults are:
 	from the commandline): FALSE
 END INVOKE
 
-
-
 '''
 
 # Command line arguments
@@ -52,9 +49,10 @@ sep1 = ","		# char sets the field seprator character in file1 to default comma
 sep2 = ","		# char sets the field seprator character in file2 to default comma
 names1 = False	# bool if true, designates the first line of file1 to be fieldnames
 names2 = False	# bool if true, designates the first line of file2 to be fieldnames
-
-bigtable = ""		# list holds the data with the greater number of records
-smalltable = ""		# list holds the data with the smaller number of records
+table1 = []		# list holds the parsed data from file1
+table2 = []		# list holds the parsed data from file2
+bigtable = []		# list holds the data with the greater number of records
+smalltable = []		# list holds the data with the smaller number of records
 
 # END Global names
 
@@ -67,14 +65,14 @@ import sys
 def arguments():
 # Get arguments
 	n = len(sys.argv)-1
-	if n < 2:
+	if n < 3:
 		print "Usage: join.py input-filename1 input-filename2 -output-filename [-type] [value] ..."
 		return -1
 	else:	
-		file1 = sys.argv[0]
-		file2 = sys.argv[1]
-		outfile = sys.argv[2]
-		for i in range(2,n):
+		file1 = sys.argv[1]
+		file2 = sys.argv[2]
+		outfile = sys.argv[3]
+		for i in range(4,n):
 			if sys.argv[i] == '-kl':
 				key1 = sys.argv[i+1]
 			elif sys.argv[i] == '-k2':
@@ -98,16 +96,13 @@ def procline(s,table,key,sep):
 # END procline
 
 
-def importfile(file,table,key,sep,names):
+def importfile(filename,table,key,sep,names):
 # Reads file from disk and passes each line to procfile()
-	global table
-
-	'''
-	Q: Would it be more efficient to read the entire file into a list and then get the size
-	from the list rather than doing a count? Probably yes.
-	'''
 	pointer = 0
-	F = open(file, 'r')
+	print "Filename:"
+	print filename
+	sys.exit()
+	F = open(filename, 'r')
 	for line in F :
 		if pointer == 1:
 			if names == FALSE:
@@ -121,27 +116,33 @@ def importfiles():
 # Imports the input files in turn, assesses the size of each, and assigns
 # the larger to the big... series of lists and the smaller to the small...
 # series of lists
+	global file1
+	global file2
 	global bigtable
 	global bigkey
 	global smalltable
 	global smallkey
+	global table1
+	global table2
 	count1 = importfile(file1,table1,key1,sep1,names1)
 	count2 = importfile(file2,table2,key2,sep2,names2)
 	if count1 > count2:
-		bigtable = file1
+		bigtable = table1
 		bigkey = key1
-		smalltable = file2
+		smalltable = table2
 		smallkey = key2
 	else:
-		bigtable = file2
+		bigtable = table2
 		bigkey = key2
-		smalltable = file1
+		smalltable = table1
 		smallkey = key1
 	'''
-	Truncating import files to reclaim memory	
+	Truncating import files and tables to reclaim memory	
 	'''
 	file1 = ""
 	file2 = ""
+	table1 = []
+	table2 = []
 # END importfiles
 
 def main() :
