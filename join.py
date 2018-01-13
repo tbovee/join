@@ -52,17 +52,9 @@ sep1 = ","		# char sets the field seprator character in file1 to default comma
 sep2 = ","		# char sets the field seprator character in file2 to default comma
 names1 = False	# bool if true, designates the first line of file1 to be fieldnames
 names2 = False	# bool if true, designates the first line of file2 to be fieldnames
-pointers1 = ""
-pointers2 = ""
-pointer1 = 0
-pointer2 = 0
 
 bigtable = ""		# list holds the data with the greater number of records
 smalltable = ""		# list holds the data with the smaller number of records
-bigpointers = ""	# list holds the key data and pointer for each line in bigtable
-smallpointers = ""	# list holds the key data and pointer for each line in smalltable.
-bigpointer = ""		# int points to current record in bigable
-smallpointer = ""	# int points to current record in smalltable
 
 # END Global names
 
@@ -97,21 +89,16 @@ def arguments():
 				names2 = TRUE
 #END Get arguments()
 
-def procline(s,sep,key,table,pointers,pointer):
+def procline(s,table,key,sep):
 # Splits s into fields and inserts into appropriate lists
-	'''
-	Is the var tablecount needed here?
-	'''
   	curr = s.split(sep)
   	k = len(curr)
 	if key < k:
 		table.append(curr)
-		pointers.append(curr[key])
-		pointers.append(pointer)
 # END procline
 
 
-def importfile(sep,key,table,pointers,pointer,file,names):
+def importfile(file,table,key,sep,names):
 # Reads file from disk and passes each line to procfile()
 	global table
 
@@ -124,9 +111,9 @@ def importfile(sep,key,table,pointers,pointer,file,names):
 	for line in F :
 		if pointer == 1:
 			if names == FALSE:
-				procline(line,sep,key,table,pointers)  
-			else:
-				procline(line,sep,key,table,pointers)  
+				procline(line,table,key,sep)
+		else:
+			procline(line,table,key,sep)
 	return len(table)
 # END importfile
 
@@ -134,33 +121,27 @@ def importfiles():
 # Imports the input files in turn, assesses the size of each, and assigns
 # the larger to the big... series of lists and the smaller to the small...
 # series of lists
-	global bigfile
+	global bigtable
 	global bigkey
-	global smallfile
+	global smalltable
 	global smallkey
-	global pointers1
-	global pointers2
-	global pointer1
-	global pointer2
-	count1 = importfile(sep1,key1,pointers1,pointer1,file1,names1)
-	count2 = importfile(sep2,key2,pointers2,pointer2,file2,names2)
+	count1 = importfile(file1,table1,key1,sep1,names1)
+	count2 = importfile(file2,table2,key2,sep2,names2)
 	if count1 > count2:
-		bigfile = file1
+		bigtable = file1
 		bigkey = key1
-		smallfile = file2
+		smalltable = file2
 		smallkey = key2
 	else:
-		bigfile = file2
+		bigtable = file2
 		bigkey = key2
-		smallfile = file1
+		smalltable = file1
 		smallkey = key1
 	'''
 	Truncating import files to reclaim memory	
 	'''
 	file1 = ""
 	file2 = ""
-	pointers1 = ""
-	pointers2 = ""
 # END importfiles
 
 def main() :
