@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180110.1311A
-# STATUS: var table is local and global
+# Version 20180113.1020A
+# ERR STATUS: var table is local and global in import routines
+# TODO: Drop the pointers, use multidimensional lists
 
 '''
 PURPOSE
@@ -35,48 +36,7 @@ The types, meanings and defaults are:
 	from the commandline): FALSE
 END INVOKE
 
-OVERVIEW:
-(Outdated)
-Read the command line arguments.
 
-Load file1 and file2 into separate lists.
-	For each file,
-	split each line and extract the key data; increment the tablecount to create the
-	pointer data; add each their pointers lists.
-	While loading extact the key field data and the line number into a pointers list
-	Pointers list structure: keydata, pointer, keydata, pointer...
-		where the pointer is associated with the preceding keydata.
-
-Joining the files
-
-After the table lists are loaded, compare tablecount1 and tablecount2. 
-If tablecount1 is larger than tablecount2, then assign 
-tablecount1 to smalltable; otherwise, assign it to bigtable. Assign
-the unassigned numbered table to the yet unassigned bigtable or smalltable.
-
-Assign the associated pointer lists in the same way, pointers1 and pointers2 to bigpointers and 
-smallpointers.
-
-Each table has a separate function.
-
-The pointers list for the largest, bigtable, is read one line at a time. 
-For each key it contains, it loops through the pointers of the 
-other table, smalltable, until it finds a matching key.
-When a matching key is found, the two lines are combined and written to
-the output file, outfile.
-
-Important naming conventions:
-Disk names are called ...file...
-The field number holding the keys is called ...key...
-The character delimiting fields in a CSV file is called ...sep...
-The presence or absense of fieldnames in the first line is denoted by ...names...
-A list containing data is called ...table...
-A list containing pointers to the data is called ...pointers...
-A number pointing to a single record in a table is a ...pointer...
-The total number of records in a table is called ...count...
-
-
-END OVERVIEW
 
 '''
 
