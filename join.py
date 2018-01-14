@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180113.1302P
+# Version 20180113.1606P
 # ERR STATUS: file2 not being processed downstream; the processed array
 # isn't being appended to table2
 
