@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180114.1321
+# Version 20180114.1512
 # ERR STATUS: file2 not being processed downstream; the processed array
 # isn't being appended to table2
 
@@ -170,10 +170,10 @@ def procline(s,tbl,key,sep):
 	s = s.rstrip()
 	if len(s) > 0:
 	  	curr = s.split(sep)
-  		k = len(curr)
+  		#k = len(curr)
 		if DEBUG == 1: 
-			print "key=",key," k=",k," key<k: ",(key<k)
-		if key < k:
+			print "key=",key," len(curr)=",len(curr)," key<len(curr): ",key<len(curr)
+		if key < len(curr):
 			if DEBUG == 1:
 				print "At append:"
 				print curr
