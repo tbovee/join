@@ -2,7 +2,8 @@
 
 # project as part of my learning python, restricted to the built-ins
 # Version 20180113.1302P
-# ERR STATUS: file2 not being processed downstream
+# ERR STATUS: file2 not being processed downstream; the processed array
+# isn't being appended to table2
 
 '''
 PURPOSE
@@ -37,7 +38,7 @@ END INVOKE
 
 '''
 
-DEBUG = True
+DEBUG = 1
 # Command line arguments
 
 # Global names
@@ -63,6 +64,7 @@ import sys
 # END Import modules
 
 
+# Get arguments
 n = len(sys.argv)-1
 if n < 3:
 	print "Usage: join.py input-filename1 input-filename2 -output-filename [-type] [value] ..."
@@ -84,15 +86,20 @@ else:
 			names1 = TRUE
 		elif sys.argv[i] == '-n2':
 			names2 = TRUE
-#END Get arguments()
+#END get arguments
 
 def procline(s,table,key,sep):
 # Splits s into fields and inserts into appropriate lists
   	curr = s.split(sep)
+  	if DEBUG == 1:
+  		print "curr ",curr
   	k = len(curr)
+  	if DEBUG == 1:
+  		print "k ",str(k)
 	if key < k:
 		table.append(curr)
-		if DEBUG == True:
+		if DEBUG == 0:
+			print "procline(): "
 			print "Raw line: "
 			print s
 			print "Processed rec: "
@@ -101,18 +108,25 @@ def procline(s,table,key,sep):
 # END procline
 
 
-def importfile(fileobj, filename,table,key,sep,names):xx
+def importfile(fileobj,table,key,sep,names):
 # Reads file from disk and passes each line to procfile()
-	pointer = 0
+	if DEBUG == 1:
+		print "importfile(): "
+		print fileobj.name
+		print fileobj.closed
+	ptr = 0
 	for line in fileobj :
-		if pointer == 1:
+		ptr = ptr + 1
+		if DEBUG == 1:
+			print "ptr ",str(ptr)
+		if ptr == 1:
 			if names == False:
 				procline(line,table,key,sep)
+			#END if names....
 		else:
 			procline(line,table,key,sep)
-		pointer = pointer + 1
+		#END if pointer...
 	return len(table)
-
 # END importfile
 
 def importfiles():
@@ -128,12 +142,19 @@ def importfiles():
 	global table1
 	global table2
 	F1 = open(file1, 'r')
-	count1 = importfile(F1,file1,table1,key1,sep1,names1)
+	if DEBUG == 1:
+		print "importfiles():"
+		print "name ",F1.name
+		print "closed ",F1.closed
+	count1 = importfile(F1,table1,key1,sep1,names1)
 	F1.close()
 	F2 = open(file2, 'r')	
-	count2 = importfile(F2,file2,table2,key2,sep2,names2)
+	if DEBUG == 1:
+		print "name ",F2.name
+		print "closed ",F2.closed
+	count2 = importfile(F2,table2,key2,sep2,names2)
 	F2.close()
-	if DEBUG == True:
+	if DEBUG == 1:
 		print "importfiles:"
 		print "Count file1=",str(count1)," file2=",str(count2)
 	if count1 > count2:
@@ -155,7 +176,7 @@ def importfiles():
 
 def main() :
 	importfiles()
-	if DEBUG == False:
+	if DEBUG == 0:
 		# Test output
 		print "Bigkey"
 		print bigkey
