@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180113.1606P
+# Version 20180114.1115A
 # ERR STATUS: file2 not being processed downstream; the processed array
 # isn't being appended to table2
 
@@ -90,43 +90,47 @@ else:
 
 def procline(s,table,key,sep):
 # Splits s into fields and inserts into appropriate lists
-  	curr = s.split(sep)
-  	if DEBUG == 1:
-  		print "curr ",curr
-  	k = len(curr)
-  	if DEBUG == 1:
-  		print "k ",str(k)
-	if key < k:
-		table.append(curr)
-		if DEBUG == 0:
-			print "procline(): "
-			print "Raw line: "
-			print s
-			print "Processed rec: "
-			print table
-			print "-----------------"
+	s = s.rstrip()
+	if len(s) > 0:
+	  	curr = s.split(sep)
+  		k = len(curr)
+		if key < k:
+			table.append(curr)
+			if DEBUG == 2:
+				print "post-append: ",table
 # END procline
 
 
-def importfile(fileobj,table,key,sep,names):
+def importfile(fileobj,t,key,sep,names):
 # Reads file from disk and passes each line to procfile()
 	if DEBUG == 1:
-		print "importfile(): "
-		print fileobj.name
-		print fileobj.closed
+		print "--------------------"
+		print "importfile() ",fileobj.name," entry: "
+		print t
 	ptr = 0
 	for line in fileobj :
-		ptr = ptr + 1
 		if DEBUG == 1:
-			print "ptr ",str(ptr)
+			print "entering line in... statement for ",fileobj.name 
+		ptr = ptr + 1
 		if ptr == 1:
 			if names == False:
+				if DEBUG == 1:
+					print "entering if names... statement for ",fileobj.name
+					print "line ",line 				
 				procline(line,table,key,sep)
 			#END if names....
 		else:
-			procline(line,table,key,sep)
+			if DEBUG == 1:
+				print "entering else... statement for ",fileobj.name 
+				print "line: ",line 				
+			procline(line,t,key,sep)
 		#END if pointer...
-	return len(table)
+	return len(t)
+	if DEBUG == 1:
+		print "importfile() exit: "
+		print table
+		print "--------------------"
+	
 # END importfile
 
 def importfiles():
@@ -142,21 +146,15 @@ def importfiles():
 	global table1
 	global table2
 	F1 = open(file1, 'r')
-	if DEBUG == 1:
-		print "importfiles():"
-		print "name ",F1.name
-		print "closed ",F1.closed
 	count1 = importfile(F1,table1,key1,sep1,names1)
 	F1.close()
 	F2 = open(file2, 'r')	
-	if DEBUG == 1:
-		print "name ",F2.name
-		print "closed ",F2.closed
 	count2 = importfile(F2,table2,key2,sep2,names2)
 	F2.close()
 	if DEBUG == 1:
 		print "importfiles:"
-		print "Count file1=",str(count1)," file2=",str(count2)
+		print "Count table1=",str(count1)," table2=",str(count2)
+		print "Len table1=",len(table1)," table2=",len(table2)
 	if count1 > count2:
 		bigtable = table1
 		bigkey = key1
@@ -176,7 +174,7 @@ def importfiles():
 
 def main() :
 	importfiles()
-	if DEBUG == 0:
+	if DEBUG == 2:
 		# Test output
 		print "Bigkey"
 		print bigkey
