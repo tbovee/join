@@ -1,9 +1,79 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180114.1115A
+# Version 20180114.1321
 # ERR STATUS: file2 not being processed downstream; the processed array
 # isn't being appended to table2
+
+'''
+ERROR DISCUSSION failure of procline on file2.
+
+The failure n procline comes at the key test, which is designed to eliminate keys 
+that exceed the number of fields.
+
+The test is: 
+	k = len(curr) # where curr is the current raw line from the file
+	if key < k:
+		#process the line
+In the case of file1, the key is zero and k is 5. 
+The statement key < k is interpreted as True.
+
+In the case of file2, the key is 2 and k is 8.
+The statement key < k is interpreted as False.
+
+I don't get it.
+
+OUTPUT of the run:
+
+sierra:join tbovee$ python join.py ./t1.csv ./t2.csv out.csv -k1 0 -k2 2
+=====================
+Entering importfile():
+File:  ./t1.csv  Closed?  False  Mode  r
+Len tbl= 0  table1= 0  table2= 0
+--------------------
+Entering procline for s:
+A,B,C,D,E
+
+key= 0  k= 5  key<k:  True
+At append:
+['A', 'B', 'C', 'D', 'E']
+--------------------
+Entering procline for s:
+F,G,H,I,J
+
+key= 0  k= 5  key<k:  True
+At append:
+['F', 'G', 'H', 'I', 'J']
+--------------------
+Entering procline for s:
+
+
+=====================
+Entering importfile():
+File:  ./t2.csv  Closed?  False  Mode  r
+Len tbl= 0  table1= 2  table2= 0
+--------------------
+Entering procline for s:
+K,L,M,N,O,P,Q,R
+
+key= 2  k= 8  key<k:  False
+--------------------
+Entering procline for s:
+S,T,A,V,W,X,Y,Z
+
+key= 2  k= 8  key<k:  False
+--------------------
+Entering procline for s:
+
+
+In main():
+Count table1= 2  table2= 0
+Len table1= 2  table2= 0
+sierra:join tbovee$ 
+
+END ERROR DISCUSSION
+'''
+
 
 '''
 PURPOSE
@@ -56,6 +126,9 @@ table2 = []		# list holds the parsed data from file2
 bigtable = []		# list holds the data with the greater number of records
 smalltable = []		# list holds the data with the smaller number of records
 
+count1 = 0
+count2 = 0
+
 # END Global names
 
 # Import modules
@@ -88,55 +161,53 @@ else:
 			names2 = TRUE
 #END get arguments
 
-def procline(s,table,key,sep):
+def procline(s,tbl,key,sep):
 # Splits s into fields and inserts into appropriate lists
+	if DEBUG == 1:
+		print "--------------------"
+		print "Entering procline for s:"
+		print s
 	s = s.rstrip()
 	if len(s) > 0:
 	  	curr = s.split(sep)
   		k = len(curr)
+		if DEBUG == 1: 
+			print "key=",key," k=",k," key<k: ",(key<k)
 		if key < k:
-			table.append(curr)
-			if DEBUG == 2:
-				print "post-append: ",table
+			if DEBUG == 1:
+				print "At append:"
+				print curr
+			tbl.append(curr)
+			s = ""
 # END procline
 
 
-def importfile(fileobj,t,key,sep,names):
+def importfile(fileobj,tbl,key,sep,names):
 # Reads file from disk and passes each line to procfile()
 	if DEBUG == 1:
-		print "--------------------"
-		print "importfile() ",fileobj.name," entry: "
-		print t
+		print "====================="
+		print "Entering importfile():"
+		print "File: ",fileobj.name," Closed? ",fileobj.closed," Mode ",fileobj.mode
+		print "Len tbl=",len(tbl)," table1=",len(table1)," table2=",len(table2)
 	ptr = 0
 	for line in fileobj :
-		if DEBUG == 1:
-			print "entering line in... statement for ",fileobj.name 
 		ptr = ptr + 1
 		if ptr == 1:
 			if names == False:
-				if DEBUG == 1:
-					print "entering if names... statement for ",fileobj.name
-					print "line ",line 				
-				procline(line,table,key,sep)
+				procline(line,tbl,key,sep)
 			#END if names....
 		else:
-			if DEBUG == 1:
-				print "entering else... statement for ",fileobj.name 
-				print "line: ",line 				
-			procline(line,t,key,sep)
+			procline(line,tbl,key,sep)
 		#END if pointer...
-	return len(t)
-	if DEBUG == 1:
-		print "importfile() exit: "
-		print table
-		print "--------------------"
-	
+	return len(tbl)
 # END importfile
 
 def importfiles():
 # Imports the input files in turn, assesses the size of each, and assigns
 # the larger to the big... series of lists and the smaller to the small...
 # series of lists
+	global F1
+	global F2
 	global file1
 	global file2
 	global bigtable
@@ -145,16 +216,15 @@ def importfiles():
 	global smallkey
 	global table1
 	global table2
+	global count1
+	global count2
+		
 	F1 = open(file1, 'r')
 	count1 = importfile(F1,table1,key1,sep1,names1)
 	F1.close()
 	F2 = open(file2, 'r')	
 	count2 = importfile(F2,table2,key2,sep2,names2)
 	F2.close()
-	if DEBUG == 1:
-		print "importfiles:"
-		print "Count table1=",str(count1)," table2=",str(count2)
-		print "Len table1=",len(table1)," table2=",len(table2)
 	if count1 > count2:
 		bigtable = table1
 		bigkey = key1
@@ -168,22 +238,16 @@ def importfiles():
 	'''
 	Truncating import tables to reclaim memory	
 	'''
-	table1 = []
-	table2 = []
+	#table1 = []
+	#table2 = []
 # END importfiles
 
 def main() :
 	importfiles()
-	if DEBUG == 2:
-		# Test output
-		print "Bigkey"
-		print bigkey
-		print "Smallkey"
-		print smallkey
-		print "Bigtable"
-		print bigtable
-		print "Smalltable"
-		print smalltable
+	if DEBUG == 1:
+		print "In main():"
+		print "Count table1=",str(count1)," table2=",str(count2)
+		print "Len table1=",len(table1)," table2=",len(table2)
 		# END Test output
 	return
 #End main
