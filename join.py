@@ -1,38 +1,10 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180114.2106
-# Next step: In joinfiles(), F3.write won't convert a list[item] with mixed strings and 
-# integers into a string for writing to disk. 
-# Converted importfiles(), importfile(), procline(),joinfiles()
-# But the importfiles tree parameters are wrong, especially tbl.
+# Version 20180115.0910
 
-'''
-ERR DISCUSSION: Solutions to list conversion error:
-
-Fix 1: Produce pointer lists to specific keys in bigtable and smalltable, 
-keeping the tables as strings from the original files.
-
-Fix 2: Do poiners, as in Fix 1, but only for smalltable, which carries the
-largest search overhead
-
-Fix 3: Don't use pointers. Instead, split the lines of bigtable and smalltable
-each time the key is needed for a line. This carries the biggest overhead in
-machine time, I suspect.
-
-Fix 4: Keep the tables just as they are. In the case of a match in the search,
-convert each field in the list item to a string. I haven't checked what
-side effects that would have when I import outfile into Google Sheets or
-some other spreadsheet.
-
-I'm leaning toward Fix 1 as the most efficient. This would require turning
-procline into mechanism for creating bigptr and smallptr, each structured as
-a list of lists, with each item having two fields: 
-	[ptr to the current line number][data in the key positon of that file]
-		
-
-'''
-
+# Current issues:
+# Table data disappearing between procline() and joinfiles(). Scoping?
 
 
 '''
@@ -83,8 +55,6 @@ sep1 = ","		# char sets the field separator character in file1 to default comma
 sep2 = ","		# char sets the field separator character in file2 to default comma
 names1 = False	# bool if true, designates the first line of file1 to be fieldnames
 names2 = False	# bool if true, designates the first line of file2 to be fieldnames
-ptrs1 = []		# list holds the key data and record pointers from file 1
-ptrs2 = []		# list holds the key data and record pointers from file 1
 bigtable = []		# list holds the csv lines for the file with the greater number of records
 smalltable = []		# list holds the csv lines for the file with the smaller number of records
 bigsep = ","		# used in joinfiles()
@@ -124,30 +94,29 @@ else:
 			names2 = TRUE
 #END get arguments
 
-def procline(s,ptr,tbl,key,sep):
-# Splits s into fields and inserts into appropriate lists
+def procline(s,tbl,key,sep):
+# Splits s into fields and inserts key field and full string into appropriate lists
 	s = s.rstrip()
 	if len(s) > 0:
 		curr = s.split(sep)
-		key = curr[key]
+		s = str(curr[key]),",",s
 		if key < len(curr):
 			tbl.append(s)
-			ptrs1.append(curr[key],ptr)
 			s = ""
 # END procline
 
 
-def importfile(fileobj,ptrs,key,sep,names):
+def importfile(fileobj,tbl,key,sep,names):
 # Reads file from disk and passes each line to procfile()
 	ptr = -1
 	for line in fileobj :
 		ptr = ptr + 1
 		if ptr == 0:
 			if names == False:
-				procline(line,ptr,tbl,key,sep)
+				procline(line,tbl,key,sep)
 			#END if names....
 		else:
-			procline(line,ptr,tbl,key,sep)
+			procline(line,tbl,key,sep)
 		#END if ptr...
 	return len(tbl)
 # END importfile
@@ -160,72 +129,68 @@ def importfiles():
 	global F2
 	global file1
 	global file2
-	global bigptrs
+	global table1
+	global table2
+	global bigtable
+	global smalltable
 	global bigkey
-	global smallptrs
 	global smallkey
 	global count1
 	global count2
-		
+	
 	F1 = open(file1, 'r')
-	count1 = importfile(F1,ptrs1,key1,sep1,names1)
+	count1 = importfile(F1,table1,key1,sep1,names1)
 	F1.close()
 	F2 = open(file2, 'r')	
-	count2 = importfile(F2,ptrs2,key2,sep2,names2)
+	count2 = importfile(F2,table2,key2,sep2,names2)
 	F2.close()
 	if count1 > count2:
 		bigtable = file1
-		bigptrs = ptrs1
 		bigkey = key1
 		bigsep = sep1
 		smalltable = table2
-		smallptrs = ptrs2
 		smallkey = key2
 	else:
 		bigtable = table2
-		bigptrs = ptrs2
 		bigkey = key2
 		bigsep = sep2
 		smalltable = table1
-		smallptrs = ptrs2
 		smallkey = key1
 # END importfiles
 
 def joinfiles():
 	global F3
 	global outfile
+	global bigtable
+	global smalltable
 	global bigsep
 	bigptr = -1
 	smallptr = -1
+	
+	print "In joinfiles():"
 	F3 = open(outfile, 'w')
 	F3.close()
 	F3 = open(outfile, "a")
-	bigend = len(bigptrs) - 1
-	smallend = len(smallptrs) -1
-	if DEBUG == 1:
-		print "len(bigptrs)=",len(bigptrs)
-	outstr = ""
-	if DEBUG == 1:
-		print "bigptr=", str(bigptr)," smallptr=",str(smallptr), " bigend=",bigend
+	bigend = len(bigtable) - 1
+	smallend = len(smalltable) - 1
+	print "     len(bigtable)=",len(bigtable)
+	print "     len(smalltable)=",len(smalltable)
+	
 	while bigptr in range(-1,bigend):
 		bigptr = bigptr + 1
 		smallptr = -1
 		while smallptr in range(-1,smallend):
 			smallptr=smallptr + 1
-			
-			if DEBUG == 1:
-				print str(smallptr)," "
-			
-			if smallptrs[smallptr][0] == bigtrs[bigptr][0]:
-				if bigptrs[bigptr][-1] <> bigsep:
+			if smalltable[smallptr][0] == bigtable[bigptr][0]:
+				if bigtable[bigptr][-1] <> bigsep:
 					bigtable[bigptr] = bigtable[bigptr],bigsep
-				outstr = bigtable[bigptr],smalltable[smallptr]
-				if DEBUG == 1:
-					print "Outstr = ",outstr
 
-				F3.write(outstr)
-			
-				outstr = ""
+				F3.write(bigtable[bigptr][1],)
+				F3.write(smalltable[smallptr][1],)
+				
+				if DEBUG == 1:
+					print "     ",bigtable[bigptr][1],smalltable[smallptr][1]
+
 				break
 	if DEBUG == 1:
 		F3.write("The last word")
