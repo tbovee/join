@@ -7,8 +7,6 @@
 # Converted importfiles(), importfile(), procline(),joinfiles()
 # But the importfiles tree parameters are wrong, especially tbl.
 
-
-
 '''
 ERR DISCUSSION: Solutions to list conversion error:
 
