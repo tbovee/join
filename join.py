@@ -1,11 +1,11 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-<<<<<<< HEAD
+#<<<<<<< HEAD
 # Version 20180114.2106
-=======
+#=======
 # Version 20180114.1930
->>>>>>> parent of cb71295... join.py
+#>>>>>>> parent of cb71295... join.py
 # Next step: In joinfiles(), F3.write won't convert a list[item] with mixed strings and 
 # integers into a string for writing to disk. 
 # Converted importfiles(), importfile(), procline(),joinfiles()
