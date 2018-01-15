@@ -1,7 +1,11 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
+<<<<<<< HEAD
 # Version 20180114.2106
+=======
+# Version 20180114.1930
+>>>>>>> parent of cb71295... join.py
 # Next step: In joinfiles(), F3.write won't convert a list[item] with mixed strings and 
 # integers into a string for writing to disk. 
 # Converted importfiles(), importfile(), procline(),joinfiles()
@@ -19,11 +23,6 @@ largest search overhead
 Fix 3: Don't use pointers. Instead, split the lines of bigtable and smalltable
 each time the key is needed for a line. This carries the biggest overhead in
 machine time, I suspect.
-
-Fix 4: Keep the tables just as they are. In the case of a match in the search,
-convert each field in the list item to a string. I haven't checked what
-side effects that would have when I import outfile into Google Sheets or
-some other spreadsheet.
 
 I'm leaning toward Fix 1 as the most efficient. This would require turning
 procline into mechanism for creating bigptr and smallptr, each structured as
