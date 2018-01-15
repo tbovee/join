@@ -1,9 +1,13 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180114.1938
+# Version 20180114.2106
 # Next step: In joinfiles(), F3.write won't convert a list[item] with mixed strings and 
-integers into a string for writing to disk. 
+# integers into a string for writing to disk. 
+# Converted importfiles(), importfile(), procline(),joinfiles()
+# But the importfiles tree parameters are wrong, especially tbl.
+
+
 
 '''
 ERR DISCUSSION: Solutions to list conversion error:
@@ -73,16 +77,18 @@ DEBUG = 1
 file1 = ""  	# str points to the first input file
 file2 = ""  	# str points to the second input file
 outfile = "" 	# str points to the output product
+table1 = []
+table2 = []
 key1 = 0 		# int points to the field containing the first key: default first field
 key2 = 0		# int points to the field containing the second key: default first field
 sep1 = ","		# char sets the field separator character in file1 to default comma
 sep2 = ","		# char sets the field separator character in file2 to default comma
 names1 = False	# bool if true, designates the first line of file1 to be fieldnames
 names2 = False	# bool if true, designates the first line of file2 to be fieldnames
-table1 = []		# list holds the parsed data from file1
-table2 = []		# list holds the parsed data from file2
-bigtable = []		# list holds the data with the greater number of records
-smalltable = []		# list holds the data with the smaller number of records
+ptrs1 = []		# list holds the key data and record pointers from file 1
+ptrs2 = []		# list holds the key data and record pointers from file 1
+bigtable = []		# list holds the csv lines for the file with the greater number of records
+smalltable = []		# list holds the csv lines for the file with the smaller number of records
 bigsep = ","		# used in joinfiles()
 
 count1 = 0
@@ -120,29 +126,31 @@ else:
 			names2 = TRUE
 #END get arguments
 
-def procline(s,tbl,key,sep):
+def procline(s,ptr,tbl,key,sep):
 # Splits s into fields and inserts into appropriate lists
 	s = s.rstrip()
 	if len(s) > 0:
 		curr = s.split(sep)
+		key = curr[key]
 		if key < len(curr):
-			tbl.append(curr)
+			tbl.append(s)
+			ptrs1.append(curr[key],ptr)
 			s = ""
 # END procline
 
 
-def importfile(fileobj,tbl,key,sep,names):
+def importfile(fileobj,ptrs,key,sep,names):
 # Reads file from disk and passes each line to procfile()
-	ptr = 0
+	ptr = -1
 	for line in fileobj :
 		ptr = ptr + 1
-		if ptr == 1:
+		if ptr == 0:
 			if names == False:
-				procline(line,tbl,key,sep)
+				procline(line,ptr,tbl,key,sep)
 			#END if names....
 		else:
-			procline(line,tbl,key,sep)
-		#END if pointer...
+			procline(line,ptr,tbl,key,sep)
+		#END if ptr...
 	return len(tbl)
 # END importfile
 
@@ -154,38 +162,35 @@ def importfiles():
 	global F2
 	global file1
 	global file2
-	global bigtable
+	global bigptrs
 	global bigkey
-	global smalltable
+	global smallptrs
 	global smallkey
-	global table1
-	global table2
 	global count1
 	global count2
 		
 	F1 = open(file1, 'r')
-	count1 = importfile(F1,table1,key1,sep1,names1)
+	count1 = importfile(F1,ptrs1,key1,sep1,names1)
 	F1.close()
 	F2 = open(file2, 'r')	
-	count2 = importfile(F2,table2,key2,sep2,names2)
+	count2 = importfile(F2,ptrs2,key2,sep2,names2)
 	F2.close()
 	if count1 > count2:
-		bigtable = table1
+		bigtable = file1
+		bigptrs = ptrs1
 		bigkey = key1
 		bigsep = sep1
 		smalltable = table2
+		smallptrs = ptrs2
 		smallkey = key2
 	else:
 		bigtable = table2
+		bigptrs = ptrs2
 		bigkey = key2
 		bigsep = sep2
 		smalltable = table1
+		smallptrs = ptrs2
 		smallkey = key1
-	'''
-	Truncating import tables to reclaim memory	
-	'''
-	table1 = []
-	table2 = []
 # END importfiles
 
 def joinfiles():
@@ -193,12 +198,17 @@ def joinfiles():
 	global outfile
 	global bigsep
 	bigptr = -1
+	smallptr = -1
 	F3 = open(outfile, 'w')
 	F3.close()
 	F3 = open(outfile, "a")
-	bigend = len(bigtable) - 1
-	smallend = len(smalltable) -1
+	bigend = len(bigptrs) - 1
+	smallend = len(smallptrs) -1
+	if DEBUG == 1:
+		print "len(bigptrs)=",len(bigptrs)
 	outstr = ""
+	if DEBUG == 1:
+		print "bigptr=", str(bigptr)," smallptr=",str(smallptr), " bigend=",bigend
 	while bigptr in range(-1,bigend):
 		bigptr = bigptr + 1
 		smallptr = -1
@@ -208,12 +218,10 @@ def joinfiles():
 			if DEBUG == 1:
 				print str(smallptr)," "
 			
-			if smalltable[smallptr][smallkey] == bigtable[bigptr][bigkey]:
-				if bigtable[bigptr][-1] <> bigsep:
+			if smallptrs[smallptr][0] == bigtrs[bigptr][0]:
+				if bigptrs[bigptr][-1] <> bigsep:
 					bigtable[bigptr] = bigtable[bigptr],bigsep
-				outstr = ''.join(bigtable[bigptr])
-				outstr = outstr.join(smalltable[smallptr])
-
+				outstr = bigtable[bigptr],smalltable[smallptr]
 				if DEBUG == 1:
 					print "Outstr = ",outstr
 
