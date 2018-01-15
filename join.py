@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180115.1415
+# Version 20180115.1428
 
 # Working version.
 
@@ -42,6 +42,7 @@ DEBUG = 1
 # Command line arguments
 
 # Global names
+verbal = 1		# int provides screen output during processing
 file1 = ""  	# str points to the first input file
 file2 = ""  	# str points to the second input file
 outfile = "" 	# str points to the output product
@@ -213,14 +214,11 @@ def joinfiles():
 				linebig = linebig + bigsep
 				if linesmall[-1] <> smallsep:
 					linesmall = linesmall + smallsep
-				F3.write(linebig + linesmall)
-				if DEBUG == 1:
-					print linebig + linesmall
+				F3.write(linebig + linesmall + "\n")
+				if verbal == 1:
+					print "Match: ",linebig + linesmall
 
-				#break
-	if DEBUG == 1:
-		F3.write("\nThe last word")
-		
+				break		
 	F3.close()
 #end joinfiles()
 				

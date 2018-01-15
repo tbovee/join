@@ -1,1 +1,1 @@
-./join.py -tl "tl.csv" -tr "tr.csv" -kl 1 -kr 3 -dl "," -dr "," -cn 0
+python ./join.py t1.csv t2.csv out.csv -k2 2
