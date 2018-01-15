@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180114.1601
-# Next step: Write join routine and write output to outfile
+# Version 20180114.1915
+# Next step: In joinfiles(), F3.write won't convert a list[item] into
+# a string for writing to disk. 
 
 
 
@@ -48,14 +49,15 @@ file2 = ""  	# str points to the second input file
 outfile = "" 	# str points to the output product
 key1 = 0 		# int points to the field containing the first key: default first field
 key2 = 0		# int points to the field containing the second key: default first field
-sep1 = ","		# char sets the field seprator character in file1 to default comma
-sep2 = ","		# char sets the field seprator character in file2 to default comma
+sep1 = ","		# char sets the field separator character in file1 to default comma
+sep2 = ","		# char sets the field separator character in file2 to default comma
 names1 = False	# bool if true, designates the first line of file1 to be fieldnames
 names2 = False	# bool if true, designates the first line of file2 to be fieldnames
 table1 = []		# list holds the parsed data from file1
 table2 = []		# list holds the parsed data from file2
 bigtable = []		# list holds the data with the greater number of records
 smalltable = []		# list holds the data with the smaller number of records
+bigsep = ","		# used in joinfiles()
 
 count1 = 0
 count2 = 0
@@ -96,7 +98,7 @@ def procline(s,tbl,key,sep):
 # Splits s into fields and inserts into appropriate lists
 	s = s.rstrip()
 	if len(s) > 0:
-	  	curr = s.split(sep)
+		curr = s.split(sep)
 		if key < len(curr):
 			tbl.append(curr)
 			s = ""
@@ -144,28 +146,64 @@ def importfiles():
 	if count1 > count2:
 		bigtable = table1
 		bigkey = key1
+		bigsep = sep1
 		smalltable = table2
 		smallkey = key2
 	else:
 		bigtable = table2
 		bigkey = key2
+		bigsep = sep2
 		smalltable = table1
 		smallkey = key1
 	'''
 	Truncating import tables to reclaim memory	
 	'''
-	#Commented out for debugging purposes
-	#table1 = []
-	#table2 = []
+	table1 = []
+	table2 = []
 # END importfiles
 
+def joinfiles():
+	global F3
+	global outfile
+	global bigsep
+	bigptr = -1
+	F3 = open(outfile, 'w')
+	F3.close()
+	F3 = open(outfile, "a")
+	bigend = len(bigtable) - 1
+	smallend = len(smalltable) -1
+	outstr = ""
+	while bigptr in range(-1,bigend):
+		bigptr = bigptr + 1
+		smallptr = -1
+		while smallptr in range(-1,smallend):
+			smallptr=smallptr + 1
+			
+			if DEBUG == 1:
+				print str(smallptr)," "
+			
+			if smalltable[smallptr][smallkey] == bigtable[bigptr][bigkey]:
+				if bigtable[bigptr][-1] <> bigsep:
+					bigtable[bigptr] = bigtable[bigptr],bigsep
+				outstr = ''.join(bigtable[bigptr])
+				outstr = outstr.join(smalltable[smallptr])
+
+				if DEBUG == 1:
+					print "Outstr = ",outstr
+
+				F3.write(outstr)
+			
+				outstr = ""
+				break
+	if DEBUG == 1:
+		F3.write("The last word")
+		
+	F3.close()
+#end joinfiles()
+				
 def main() :
 	importfiles()
-	if DEBUG == 1:
-		print "In main():"
-		print "Count table1=",str(count1)," table2=",str(count2)
-		print "Len table1=",len(table1)," table2=",len(table2)
-		# END Test output
+	joinfiles()
 	return
 #End main
 
