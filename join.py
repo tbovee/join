@@ -1,78 +1,9 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180114.1512
-# ERR STATUS: file2 not being processed downstream; the processed array
-# isn't being appended to table2
+# Version 20180114.1601
+# Next step: Write join routine and write output to outfile
 
-'''
-ERROR DISCUSSION failure of procline on file2.
-
-The failure n procline comes at the key test, which is designed to eliminate keys 
-that exceed the number of fields.
-
-The test is: 
-	k = len(curr) # where curr is the current raw line from the file
-	if key < k:
-		#process the line
-In the case of file1, the key is zero and k is 5. 
-The statement key < k is interpreted as True.
-
-In the case of file2, the key is 2 and k is 8.
-The statement key < k is interpreted as False.
-
-I don't get it.
-
-OUTPUT of the run:
-
-sierra:join tbovee$ python join.py ./t1.csv ./t2.csv out.csv -k1 0 -k2 2
-=====================
-Entering importfile():
-File:  ./t1.csv  Closed?  False  Mode  r
-Len tbl= 0  table1= 0  table2= 0
---------------------
-Entering procline for s:
-A,B,C,D,E
-
-key= 0  k= 5  key<k:  True
-At append:
-['A', 'B', 'C', 'D', 'E']
---------------------
-Entering procline for s:
-F,G,H,I,J
-
-key= 0  k= 5  key<k:  True
-At append:
-['F', 'G', 'H', 'I', 'J']
---------------------
-Entering procline for s:
-
-
-=====================
-Entering importfile():
-File:  ./t2.csv  Closed?  False  Mode  r
-Len tbl= 0  table1= 2  table2= 0
---------------------
-Entering procline for s:
-K,L,M,N,O,P,Q,R
-
-key= 2  k= 8  key<k:  False
---------------------
-Entering procline for s:
-S,T,A,V,W,X,Y,Z
-
-key= 2  k= 8  key<k:  False
---------------------
-Entering procline for s:
-
-
-In main():
-Count table1= 2  table2= 0
-Len table1= 2  table2= 0
-sierra:join tbovee$ 
-
-END ERROR DISCUSSION
-'''
 
 
 '''
@@ -147,10 +78,10 @@ else:
 	file2 = sys.argv[2]
 	outfile = sys.argv[3]
 	for i in range(4,n):
-		if sys.argv[i] == '-kl':
-			key1 = sys.argv[i+1]
+		if sys.argv[i] == '-k1':
+			key1 = int(sys.argv[i+1])
 		elif sys.argv[i] == '-k2':
-			key2 = sys.argv[i+1]
+			key2 = int(sys.argv[i+1])
 		elif sys.argv[i] == '-s1':
 			sep1 = sys.argv[i+1]
 		elif sys.argv[i] == '-s2':
@@ -163,19 +94,10 @@ else:
 
 def procline(s,tbl,key,sep):
 # Splits s into fields and inserts into appropriate lists
-	if DEBUG == 1:
-		print "--------------------"
-		print "Entering procline for s:"
-		print s
 	s = s.rstrip()
 	if len(s) > 0:
 	  	curr = s.split(sep)
-		if DEBUG == 1: 
-			print "key=",key," len(curr)=",len(curr)," key<len(curr): ",key<len(curr)
 		if key < len(curr):
-			if DEBUG == 1:
-				print "At append:"
-				print curr
 			tbl.append(curr)
 			s = ""
 # END procline
@@ -183,11 +105,6 @@ def procline(s,tbl,key,sep):
 
 def importfile(fileobj,tbl,key,sep,names):
 # Reads file from disk and passes each line to procfile()
-	if DEBUG == 1:
-		print "====================="
-		print "Entering importfile():"
-		print "File: ",fileobj.name," Closed? ",fileobj.closed," Mode ",fileobj.mode
-		print "Len tbl=",len(tbl)," table1=",len(table1)," table2=",len(table2)
 	ptr = 0
 	for line in fileobj :
 		ptr = ptr + 1
@@ -237,6 +154,7 @@ def importfiles():
 	'''
 	Truncating import tables to reclaim memory	
 	'''
+	#Commented out for debugging purposes
 	#table1 = []
 	#table2 = []
 # END importfiles
