@@ -1,21 +1,9 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180115.1337
+# Version 20180115.1415
 
-# Current issues:
-# Concatenation of string joins to produce joined string.
-# They are being treated as tuples rather than strings.
-# The source of the strings is table[n][1]
-
-# It appears impossible to pluck a string from a field in a list
-# and find it intact in the form in which was entered.
-
-# Solution: abandon table1 and table2. 
-# In procline(), create lists (ptrs1, ptrs2) for file1 and file2 that have two fields:
-# 	[data[key],[fileN->ptr], where ptr = line number
-# In joinfiles(), 
-
+# Working version.
 
 '''
 PURPOSE
@@ -65,9 +53,15 @@ sep1 = ","		# char sets the field separator character in file1 to default comma
 sep2 = ","		# char sets the field separator character in file2 to default comma
 names1 = False	# bool if true, designates the first line of file1 to be fieldnames
 names2 = False	# bool if true, designates the first line of file2 to be fieldnames
-bigtable = []		# list holds the csv lines for the file with the greater number of records
-smalltable = []		# list holds the csv lines for the file with the smaller number of records
+# The big.../small... variables are abstractions based on file size used in joinfiles()
+bigfile = ""	# str holder for file1 or file2 in joinfiles()
+smallfile = ""	# str holder for file1 or file2 in joinfiles()
+bigtable = []		# list holds key data and pointer to the line number of the file
+smalltable = []		# list holds key data and pointer to the line number of the file
+bigkey = 0			# int points to key field in bigfile
+smallkey = 0		# int points to key field in smallfile
 bigsep = ","		# used in joinfiles()
+smallsep = ","		# used in joinfiles()
 
 count1 = 0
 count2 = 0
@@ -141,10 +135,16 @@ def importfiles():
 	global file2
 	global table1
 	global table2
+	global key1
+	global key2
+	global bigfile
+	global smallfile
 	global bigtable
 	global smalltable
 	global bigkey
 	global smallkey
+	global bigsep
+	global smallsep
 	global count1
 	global count2
 	
@@ -174,14 +174,11 @@ def importfiles():
 # END importfiles
 
 def getline(filename, p):
-	if DEBUG == 1:
-		print "In getline()"
 	i = 0
-	print filename
 	F4 = open(filename, "r")
 	for line in F4:
 		if i == p:
-			print line
+			line = line.rstrip()
 			return line
 			break
 		else:
@@ -191,14 +188,14 @@ def getline(filename, p):
 
 def joinfiles():
 	global F3
+	global bigfile
+	global smallfile
 	global outfile
 	global bigtable
 	global smalltable
 	global bigsep
 	bigptr = -1
 	smallptr = -1
-	if DEBUG == 1:
-		print "In joinfiles():"
 	F3 = open(outfile, 'w')
 	F3.close()
 	F3 = open(outfile, "a")
@@ -210,23 +207,17 @@ def joinfiles():
 		smallptr = -1
 		while smallptr in range(-1,smallend):
 			smallptr=smallptr + 1
-			print "     small= ", smalltable[smallptr][0], " big=", bigtable[bigptr][0] 
 			if smalltable[smallptr][0] == bigtable[bigptr][0]:
-				print bigfile
 				linebig = getline(bigfile,bigptr)
 				linesmall = getline(smallfile,smallptr)
-
-				if linebig[-1] <> bigsep:
-					linebig = linebig + bigsep
+				linebig = linebig + bigsep
 				if linesmall[-1] <> smallsep:
-					linesmall = linesmal + smallsep
+					linesmall = linesmall + smallsep
 				F3.write(linebig + linesmall)
-				F3.write(str(smalltable[smallptr][1]))
-				
 				if DEBUG == 1:
 					print linebig + linesmall
 
-				break
+				#break
 	if DEBUG == 1:
 		F3.write("\nThe last word")
 		
