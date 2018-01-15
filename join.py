@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180115.1231
+# Version 20180115.1337
 
 # Current issues:
 # Concatenation of string joins to produce joined string.
@@ -155,7 +155,7 @@ def importfiles():
 	count2 = importfile(F2,table2,key2,sep2,names2)
 	F2.close()
 	if count1 > count2:
-		bigtable = file1
+		bigtable = table1
 		bigfile = file1
 		bigkey = key1
 		bigsep = sep1
@@ -173,15 +173,20 @@ def importfiles():
 		smallkey = key1
 # END importfiles
 
-def getline(filename,ptr)
+def getline(filename, p):
+	if DEBUG == 1:
+		print "In getline()"
 	i = 0
+	print filename
 	F4 = open(filename, "r")
 	for line in F4:
-		if i == ptr:
+		if i == p:
+			print line
 			return line
 			break
 		else:
 			i = i + 1
+	F4.close()
 # END getline()
 
 def joinfiles():
@@ -205,10 +210,12 @@ def joinfiles():
 		smallptr = -1
 		while smallptr in range(-1,smallend):
 			smallptr=smallptr + 1
-			
+			print "     small= ", smalltable[smallptr][0], " big=", bigtable[bigptr][0] 
 			if smalltable[smallptr][0] == bigtable[bigptr][0]:
+				print bigfile
 				linebig = getline(bigfile,bigptr)
 				linesmall = getline(smallfile,smallptr)
+
 				if linebig[-1] <> bigsep:
 					linebig = linebig + bigsep
 				if linesmall[-1] <> smallsep:
