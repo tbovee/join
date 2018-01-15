@@ -1,10 +1,11 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180115.0910
+# Version 20180115.1018
 
 # Current issues:
-# Table data disappearing between procline() and joinfiles(). Scoping?
+# Table data disappearing between procline() and joinfiles(). 
+#	Record construction problem in table1, table2 in procline
 
 
 '''
@@ -173,13 +174,16 @@ def joinfiles():
 	F3 = open(outfile, "a")
 	bigend = len(bigtable) - 1
 	smallend = len(smalltable) - 1
-	print "     len(bigtable)=",len(bigtable)
-	print "     len(smalltable)=",len(smalltable)
 	
 	while bigptr in range(-1,bigend):
 		bigptr = bigptr + 1
 		smallptr = -1
 		while smallptr in range(-1,smallend):
+
+			print "     bigtable[bigptr]=",bigtable[bigptr][1]
+			print "     smalltable[smallptr]=",smalltable[smallptr][1]
+
+
 			smallptr=smallptr + 1
 			if smalltable[smallptr][0] == bigtable[bigptr][0]:
 				if bigtable[bigptr][-1] <> bigsep:
