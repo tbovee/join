@@ -6,18 +6,19 @@ import sys
 recs = []
 
 def main() : 
-  a = 1,2,3,4,5
-  b = 6,7,8,9,10
-  c = 11,12,13,14,15,a
-  d = 16,17,18,19,20,b
+  a = ['A'],["this land is my land"]
+  b = ['B'],["and our land"]
   
   recs.append(a)
   recs.append(b)
-  recs.append(c)
-  print recs[0]
-  print recs[1]
-  print recs[2]
-  print recs[2][5][3]
+  first = str(recs[0][1])
+  first = first.strip(["[","]"])
+  print first
+  sys.exit()
+  print str(recs[0][1])
+  print recs[1][1]
+  print str(str(recs[0][1]) + str(recs[1][1]))
+  
 
   
   

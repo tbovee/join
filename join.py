@@ -1,11 +1,20 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180115.1018
+# Version 20180115.1145
 
 # Current issues:
-# Table data disappearing between procline() and joinfiles(). 
-#	Record construction problem in table1, table2 in procline
+# Concatenation of string joins to produce joined string.
+# They are being treated as tuples rather than strings.
+# The source of the strings is table[n][1]
+
+# It appears impossible to pluck a string from a field in a list
+# and find it intact in the form in which was entered.
+
+# Solution: abandon table1 and table2. 
+# In procline(), create lists (ptrs1, ptrs2) for file1 and file2 that have two fields:
+# 	[data[key],[fileN->ptr], where ptr = line number
+# In joinfiles(), 
 
 
 '''
@@ -100,9 +109,9 @@ def procline(s,tbl,key,sep):
 	s = s.rstrip()
 	if len(s) > 0:
 		curr = s.split(sep)
-		s = str(curr[key]),",",s
 		if key < len(curr):
-			tbl.append(s)
+			rec = [curr[key],s]
+			tbl.append(rec)
 			s = ""
 # END procline
 
@@ -167,8 +176,8 @@ def joinfiles():
 	global bigsep
 	bigptr = -1
 	smallptr = -1
-	
-	print "In joinfiles():"
+	if DEBUG == 1:
+		print "In joinfiles():"
 	F3 = open(outfile, 'w')
 	F3.close()
 	F3 = open(outfile, "a")
@@ -179,25 +188,23 @@ def joinfiles():
 		bigptr = bigptr + 1
 		smallptr = -1
 		while smallptr in range(-1,smallend):
-
-			print "     bigtable[bigptr]=",bigtable[bigptr][1]
-			print "     smalltable[smallptr]=",smalltable[smallptr][1]
-
-
 			smallptr=smallptr + 1
 			if smalltable[smallptr][0] == bigtable[bigptr][0]:
 				if bigtable[bigptr][-1] <> bigsep:
-					bigtable[bigptr] = bigtable[bigptr],bigsep
+					bigtable[bigptr][1] = bigtable[bigptr][1],bigsep
 
-				F3.write(bigtable[bigptr][1],)
-				F3.write(smalltable[smallptr][1],)
+				F3.write(str(bigtable[bigptr][1]),)
+				F3.write(str(smalltable[smallptr][1]))
 				
 				if DEBUG == 1:
-					print "     ",bigtable[bigptr][1],smalltable[smallptr][1]
+					s1 = str(bigtable[bigptr][1])
+					s2 = str(smalltable[smallptr][1])
+					s = s1 + s2
+					print s
 
 				break
 	if DEBUG == 1:
-		F3.write("The last word")
+		F3.write("\nThe last word")
 		
 	F3.close()
 #end joinfiles()
