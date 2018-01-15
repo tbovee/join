@@ -1,9 +1,30 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180114.1915
-# Next step: In joinfiles(), F3.write won't convert a list[item] into
-# a string for writing to disk. 
+# Version 20180114.1930
+# Next step: In joinfiles(), F3.write won't convert a list[item] with mixed strings and 
+integers into a string for writing to disk. 
+
+'''
+ERR DISCUSSION: Solutions to list conversion error:
+
+Fix 1: Produce pointer lists to specific keys in bigtable and smalltable, 
+keeping the tables as strings from the original files.
+
+Fix 2: Do poiners, as in Fix 1, but only for smalltable, which carries the
+largest search overhead
+
+Fix 3: Don't use pointers. Instead, split the lines of bigtable and smalltable
+each time the key is needed for a line. This carries the biggest overhead in
+machine time, I suspect.
+
+I'm leaning toward Fix 1 as the most efficient. This would require turning
+procline into mechanism for creating bigptr and smallptr, each structured as
+a list of lists, with each item having two fields: 
+	[ptr to the current line number][data in the key positon of that file]
+		
+
+'''
 
 
 
