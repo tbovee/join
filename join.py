@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180115.1145
+# Version 20180115.1231
 
 # Current issues:
 # Concatenation of string joins to produce joined string.
@@ -57,8 +57,8 @@ DEBUG = 1
 file1 = ""  	# str points to the first input file
 file2 = ""  	# str points to the second input file
 outfile = "" 	# str points to the output product
-table1 = []
-table2 = []
+table1 = []		# [str][int] where str is data[key] and int is the line# in file1
+table2 = []		# [str][int] where str is data[key] and int is the line# in file2
 key1 = 0 		# int points to the field containing the first key: default first field
 key2 = 0		# int points to the field containing the second key: default first field
 sep1 = ","		# char sets the field separator character in file1 to default comma
@@ -104,13 +104,13 @@ else:
 			names2 = TRUE
 #END get arguments
 
-def procline(s,tbl,key,sep):
+def procline(s,tbl,key,sep,ptr):
 # Splits s into fields and inserts key field and full string into appropriate lists
 	s = s.rstrip()
 	if len(s) > 0:
 		curr = s.split(sep)
 		if key < len(curr):
-			rec = [curr[key],s]
+			rec = [curr[key],ptr]
 			tbl.append(rec)
 			s = ""
 # END procline
@@ -123,10 +123,10 @@ def importfile(fileobj,tbl,key,sep,names):
 		ptr = ptr + 1
 		if ptr == 0:
 			if names == False:
-				procline(line,tbl,key,sep)
+				procline(line,tbl,key,sep,ptr)
 			#END if names....
 		else:
-			procline(line,tbl,key,sep)
+			procline(line,tbl,key,sep,ptr)
 		#END if ptr...
 	return len(tbl)
 # END importfile
@@ -156,17 +156,33 @@ def importfiles():
 	F2.close()
 	if count1 > count2:
 		bigtable = file1
+		bigfile = file1
 		bigkey = key1
 		bigsep = sep1
 		smalltable = table2
+		smallfile = file2
 		smallkey = key2
+		
 	else:
 		bigtable = table2
+		bigfile = file2
 		bigkey = key2
 		bigsep = sep2
 		smalltable = table1
+		smallfile = file1
 		smallkey = key1
 # END importfiles
+
+def getline(filename,ptr)
+	i = 0
+	F4 = open(filename, "r")
+	for line in F4:
+		if i == ptr:
+			return line
+			break
+		else:
+			i = i + 1
+# END getline()
 
 def joinfiles():
 	global F3
@@ -189,18 +205,19 @@ def joinfiles():
 		smallptr = -1
 		while smallptr in range(-1,smallend):
 			smallptr=smallptr + 1
+			
 			if smalltable[smallptr][0] == bigtable[bigptr][0]:
-				if bigtable[bigptr][-1] <> bigsep:
-					bigtable[bigptr][1] = bigtable[bigptr][1],bigsep
-
-				F3.write(str(bigtable[bigptr][1]),)
+				linebig = getline(bigfile,bigptr)
+				linesmall = getline(smallfile,smallptr)
+				if linebig[-1] <> bigsep:
+					linebig = linebig + bigsep
+				if linesmall[-1] <> smallsep:
+					linesmall = linesmal + smallsep
+				F3.write(linebig + linesmall)
 				F3.write(str(smalltable[smallptr][1]))
 				
 				if DEBUG == 1:
-					s1 = str(bigtable[bigptr][1])
-					s2 = str(smalltable[smallptr][1])
-					s = s1 + s2
-					print s
+					print linebig + linesmall
 
 				break
 	if DEBUG == 1:
