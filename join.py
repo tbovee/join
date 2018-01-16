@@ -1,15 +1,19 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180116.7:15 [1.0]
+# Version 20180116.7:45 [1.0]
 
 # Working version.
 
 '''
 Next steps:
-	Add a function (invoked with [-q 0 | 1] that will strip quotes from the
-		key fields before comparison. Default is 1.
-	Test handling of label lines
+	Add a function (invoked with [-q] that will suppress the stripping of quotes 
+		from the key fields before comparison. Stripping will occur by default.
+	Enhance handling of label lines, as follows:
+		If [-l1] or [-l2] are present in the command, treat the first line
+		in the file as a label line, save it to a variable, and write it to 
+		outfile ahead of the data. If [-ln] is present, that line will be
+		suppressed in the comparisons (as has been the case from the outset.)
 	Test handling if the key field number exceeds the number of fields
 	Write and test the help function
 	Write a manual
