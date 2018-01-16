@@ -1,9 +1,27 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180115.1430
+# Version 20180115.1430 [1.0]
 
 # Working version.
+
+'''
+Next steps:
+	Test handling of label lines
+	Test handling if the key field number exceeds the number of fields
+	Write and test the help function
+	Write a manual
+	Write a lessons learned report
+	
+Environment requirements:
+	Build an operating folder for my trading with code, a place for files and an
+		invocation script
+	Investigate the extent to which I can automate data downloads.
+	Question: Should the environment live on my MacBook or my server?
+
+Version 2.0:
+	Rewrite use the Panda module for the data handling.
+'''
 
 '''
 PURPOSE
