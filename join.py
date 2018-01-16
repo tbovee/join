@@ -1,14 +1,12 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180116.7:45 [1.0]
+# Version 20180116.11:45 [1.0]
 
 # Working version.
 
 '''
 Next steps:
-	Add a function (invoked with [-q] that will suppress the stripping of quotes 
-		from the key fields before comparison. Stripping will occur by default.
 	Enhance handling of label lines, as follows:
 		If [-l1] or [-l2] are present in the command, treat the first line
 		in the file as a label line, save it to a variable, and write it to 
@@ -58,6 +56,7 @@ The types, meanings and defaults are:
 	of the fields and sets a flag in code to TRUE. 
 	It requires no value. Default (i.e., the -n1 or -n2 flag is absent
 	from the commandline): FALSE
+-q suppresses the default stripping of double quotes from around key fields data.
 END INVOKE
 
 '''
@@ -87,6 +86,8 @@ bigkey = 0			# int points to key field in bigfile
 smallkey = 0		# int points to key field in smallfile
 bigsep = ","		# used in joinfiles()
 smallsep = ","		# used in joinfiles()
+# Both input tables
+stripquotes = 0		# set not stripping quotes as the default
 
 count1 = 0
 count2 = 0
@@ -100,7 +101,7 @@ import sys
 
 
 # Get arguments
-n = len(sys.argv)-1
+n = len(sys.argv)
 if n < 3:
 	print "Usage: join.py input-filename1 input-filename2 -output-filename [-type] [value] ..."
 	sys.exit()
@@ -108,7 +109,7 @@ else:
 	file1 = sys.argv[1]
 	file2 = sys.argv[2]
 	outfile = sys.argv[3]
-	for i in range(4,n):
+	for i in range(3,n):
 		if sys.argv[i] == '-k1':
 			key1 = int(sys.argv[i+1])
 		elif sys.argv[i] == '-k2':
@@ -118,16 +119,22 @@ else:
 		elif sys.argv[i] == '-s2':
 			sep2 = sys.argv[i+1]
 		elif sys.argv[i] == '-n1':
-			names1 = TRUE
+			names1 = 1
 		elif sys.argv[i] == '-n2':
-			names2 = TRUE
+			names2 = 1
+		elif sys.argv[i] == '-q':
+			stripquotes = 1
 #END get arguments
+
 
 def procline(s,tbl,key,sep,ptr):
 # Splits s into fields and inserts key field and full string into appropriate lists
 	s = s.rstrip()
 	if len(s) > 0:
 		curr = s.split(sep)
+		if stripquotes == 0:
+			curr[key] = curr[key].strip('"')
+
 		if key < len(curr):
 			rec = [curr[key],ptr]
 			tbl.append(rec)
