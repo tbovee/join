@@ -1,12 +1,14 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180115.1820 [1.0]
+# Version 20180116.7:15 [1.0]
 
 # Working version.
 
 '''
 Next steps:
+	Add a function (invoked with [-q 0 | 1] that will strip quotes from the
+		key fields before comparison. Default is 1.
 	Test handling of label lines
 	Test handling if the key field number exceeds the number of fields
 	Write and test the help function

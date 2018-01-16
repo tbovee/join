@@ -1,2 +1,0 @@
-python ./join.py zalink.csv Tdata0122-29.csv Earns0122-29.csv -k1 1
-
