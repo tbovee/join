@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Version 20180116.11:45 [1.0]
+# Build 20180116.1925
+# Version 1.01
 
-# Working version.
+# Update 20180116.1145 Added control for paragraph mark removal
 
 '''
 Next steps:
@@ -13,6 +14,7 @@ Next steps:
 		outfile ahead of the data. If [-ln] is present, that line will be
 		suppressed in the comparisons (as has been the case from the outset.)
 	Test handling if the key field number exceeds the number of fields
+	Implement inner and outer joins
 	Write and test the help function
 	Write a manual
 	Write a lessons learned report
