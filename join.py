@@ -1,10 +1,11 @@
 #! /usr/bin/env python
 
 # project as part of my learning python, restricted to the built-ins
-# Build 20180116.1925
+# Build 20180117.0625
 # Version 1.01
 
-# Update 20180116.1145 Added control for paragraph mark removal
+# [v1.01/20180116.1145] Added paragraph mark removal
+# [v1.00/20180115.1430] Initial working version
 
 '''
 Next steps:
